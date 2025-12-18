@@ -265,14 +265,26 @@ function saveImageEdit(imgElement) {
         imgElement.dataset.originalSrc = originalSrc;
     }
 
+    // Base64 이미지는 localStorage 용량을 많이 차지하므로 크기만 저장
+    // 크롭된 이미지는 저장하지 않고, 크기 조절만 저장
     edits.images[originalSrc] = {
-        src: imgSrc,
         width: imgElement.style.width,
         height: imgElement.style.height,
         maxWidth: imgElement.style.maxWidth
     };
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(edits));
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(edits));
+    } catch (e) {
+        if (e.name === 'QuotaExceededError') {
+            console.warn('localStorage 용량 초과. 이전 데이터를 삭제합니다.');
+            localStorage.removeItem(STORAGE_KEY);
+            // 재시도
+            edits.images = { [originalSrc]: edits.images[originalSrc] };
+            edits.texts = {};
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(edits));
+        }
+    }
 }
 
 function saveTextEdit(element) {
@@ -343,7 +355,8 @@ function restoreEdits() {
 
         if (img && !img.closest('#editor-controls') && !img.closest('#crop-modal')) {
             img.dataset.originalSrc = originalSrc;
-            img.src = imgData.src;
+            // Base64 src는 복원하지 않음 (localStorage 용량 문제)
+            // 크기만 복원
             if (imgData.width) img.style.width = imgData.width;
             if (imgData.height) img.style.height = imgData.height;
             if (imgData.maxWidth) img.style.maxWidth = imgData.maxWidth;
