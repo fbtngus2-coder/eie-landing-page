@@ -117,6 +117,13 @@ export function initEditor() {
             }
         });
 
+        // 모든 이미지도 저장 (data-original-src가 있는 이미지만)
+        document.querySelectorAll('img[data-original-src]').forEach(img => {
+            if (!img.closest('#editor-controls') && !img.closest('#crop-modal')) {
+                saveImageEdit(img);
+            }
+        });
+
         // 저장 확인 메시지
         const message = document.createElement('div');
         message.textContent = '✅ 저장되었습니다!';
@@ -312,10 +319,29 @@ function restoreEdits() {
     // 이미지 복원
     Object.keys(edits.images).forEach(originalSrc => {
         const imgData = edits.images[originalSrc];
-        const img = document.querySelector(`img[src="${originalSrc}"]`) ||
-            document.querySelector(`img[data-original-src="${originalSrc}"]`);
 
-        if (img) {
+        // 다양한 방법으로 이미지 찾기
+        let img = document.querySelector(`img[data-original-src="${originalSrc}"]`);
+
+        if (!img) {
+            // data-original-src가 없으면 src로 찾기
+            img = document.querySelector(`img[src="${originalSrc}"]`);
+        }
+
+        if (!img) {
+            // src 경로의 마지막 부분으로만 찾기
+            const filename = originalSrc.split('/').pop();
+            const allImages = document.querySelectorAll('img');
+            for (const image of allImages) {
+                const imgSrc = image.getAttribute('src') || image.src;
+                if (imgSrc && imgSrc.includes(filename)) {
+                    img = image;
+                    break;
+                }
+            }
+        }
+
+        if (img && !img.closest('#editor-controls') && !img.closest('#crop-modal')) {
             img.dataset.originalSrc = originalSrc;
             img.src = imgData.src;
             if (imgData.width) img.style.width = imgData.width;
