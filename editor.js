@@ -51,7 +51,6 @@ export function initEditor() {
                 if (isEditMode) {
                     img.style.cursor = 'pointer';
                     img.style.outline = '2px dashed rgba(140, 0, 43, 0.5)';
-                    img.crossOrigin = 'anonymous'; // CORS 문제 방지
                     img.onclick = () => openImageEditor(img);
                 } else {
                     img.style.cursor = '';
@@ -125,16 +124,8 @@ export function initEditor() {
                     .from(STORAGE_BUCKET)
                     .getPublicUrl(filename);
 
-                console.log('✅ 업로드 성공! URL:', publicUrl);
-
                 // 이미지 src 업데이트
                 currentImageElement.src = publicUrl;
-
-                // 중요: srcset 속성이 있다면 제거 (반응형 이미지 충돌 방지)
-                if (currentImageElement.hasAttribute('srcset')) {
-                    console.log('⚠️ srcset 속성 감지됨. 제거합니다.');
-                    currentImageElement.removeAttribute('srcset');
-                }
 
                 // 크기 적용
                 const size = imageSizeSlider.value;
@@ -157,30 +148,6 @@ export function initEditor() {
             }
         }
         closeModal();
-    });
-
-    // 새 이미지 업로드 버튼 기능 복구
-    // 버튼 ID가 명확하지 않으므로 텍스트로 찾아서 연결하거나, 모달 내의 특정 버튼을 타겟팅
-    const uploadNewImageBtn = Array.from(cropModal.querySelectorAll('button')).find(btn => btn.textContent.includes('새 이미지 업로드') || btn.classList.contains('btn-secondary'));
-
-    if (uploadNewImageBtn) {
-        uploadNewImageBtn.onclick = () => imageInput.click();
-    }
-
-    // 파일 선택 시 Cropper 이미지 교체
-    imageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (readerEvent) => {
-                if (cropper) {
-                    cropper.replace(readerEvent.target.result);
-                }
-                // 입력값 초기화 (동일 파일 재선택 가능하게)
-                imageInput.value = '';
-            };
-            reader.readAsDataURL(file);
-        }
     });
 
     cropCancelBtn.addEventListener('click', () => {
@@ -345,11 +312,7 @@ async function restoreEdits() {
                     console.log('✅ 텍스트 복원:', item.selector);
                 } else if (item.content_type === 'image') {
                     const styleData = JSON.parse(item.value);
-                    if (styleData.src) {
-                        element.src = styleData.src;
-                        // 복원 시에도 srcset 제거
-                        if (element.hasAttribute('srcset')) element.removeAttribute('srcset');
-                    }
+                    if (styleData.src) element.src = styleData.src;
                     if (styleData.width) element.style.width = styleData.width;
                     if (styleData.height) element.style.height = styleData.height;
                     if (styleData.maxWidth) element.style.maxWidth = styleData.maxWidth;
