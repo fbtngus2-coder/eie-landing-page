@@ -30,7 +30,9 @@ export function initEditor() {
         toggleBtn.textContent = isEditMode ? '✅ 편집 모드 끄기' : '✏️ 편집 모드 켜기';
         toggleBtn.style.background = isEditMode ? '#28a745' : '#8C002B';
         toggleBtn.style.borderColor = isEditMode ? '#28a745' : '#8C002B';
-        editButtonsGroup.style.display = isEditMode ? 'flex' : 'none';
+        if (editButtonsGroup) {
+            editButtonsGroup.style.display = isEditMode ? 'flex' : 'none';
+        }
 
         setupEditableElements();
     });
