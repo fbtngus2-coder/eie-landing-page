@@ -260,8 +260,6 @@ async function restoreEdits() {
 
         if (error) throw error;
 
-        console.log('불러온 데이터:', data);
-
         if (!data || data.length === 0) {
             console.log('저장된 데이터가 없습니다.');
             return;
