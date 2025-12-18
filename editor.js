@@ -14,8 +14,6 @@ export function initEditor() {
     const cropCancelBtn = document.getElementById('crop-cancel');
     const cropApplyBtn = document.getElementById('crop-apply');
     const imageInput = document.getElementById('image-upload-input');
-    const downloadBtn = document.getElementById('download-html');
-    const resetBtn = document.getElementById('reset-edits');
     const saveBtn = document.getElementById('save-edits');
     const editButtonsGroup = document.getElementById('edit-buttons');
     const imageSizeSlider = document.getElementById('image-size-slider');
@@ -152,31 +150,6 @@ export function initEditor() {
 
     cropCancelBtn.addEventListener('click', () => {
         closeModal();
-    });
-
-    // Download HTML
-    downloadBtn.addEventListener('click', () => {
-        downloadCurrentHTML();
-    });
-
-    // Reset Edits
-    resetBtn.addEventListener('click', async () => {
-        if (confirm('모든 편집 내용을 삭제하시겠습니까?')) {
-            try {
-                // Supabase에서 모든 데이터 삭제
-                const { error } = await supabase
-                    .from(TABLE_NAME)
-                    .delete()
-                    .neq('id', 0); // 모든 행 삭제
-
-                if (error) throw error;
-
-                location.reload();
-            } catch (error) {
-                console.error('초기화 실패:', error);
-                alert('❌ 초기화에 실패했습니다: ' + error.message);
-            }
-        }
     });
 
     // Save Edits
@@ -362,15 +335,4 @@ function getUniqueSelector(element) {
     return path.join(' > ');
 }
 
-function downloadCurrentHTML() {
-    const html = document.documentElement.outerHTML;
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'eie-landing-page.html';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
+
