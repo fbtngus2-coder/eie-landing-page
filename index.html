@@ -18,18 +18,23 @@
 <body>
     <!-- Editor Controls -->
     <div id="editor-controls"
-        style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; gap: 10px;">
+        style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; gap: 10px; flex-direction: column; align-items: flex-end;">
         <button id="toggle-edit-mode" class="btn btn-primary" style="box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
             ✏️ 편집 모드 켜기
         </button>
-        <button id="reset-edits" class="btn btn-secondary"
-            style="display: none; background: #dc3545; color: #fff; border: 1px solid #dc3545;">
-            🔄 초기화
-        </button>
-        <button id="download-html" class="btn btn-secondary"
-            style="display: none; background: #333; color: #fff; border: 1px solid #333;">
-            💾 HTML 다운로드
-        </button>
+        <div style="display: none; gap: 10px;" id="edit-buttons">
+            <button id="save-edits" class="btn btn-primary" style="background: #28a745; border: 1px solid #28a745;">
+                💾 저장
+            </button>
+            <button id="reset-edits" class="btn btn-secondary"
+                style="background: #dc3545; color: #fff; border: 1px solid #dc3545;">
+                🔄 초기화
+            </button>
+            <button id="download-html" class="btn btn-secondary"
+                style="background: #333; color: #fff; border: 1px solid #333;">
+                📥 다운로드
+            </button>
+        </div>
     </div>
 
     <!-- Image Crop Modal -->

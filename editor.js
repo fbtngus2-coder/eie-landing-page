@@ -16,6 +16,8 @@ export function initEditor() {
     const imageInput = document.getElementById('image-upload-input');
     const downloadBtn = document.getElementById('download-html');
     const resetBtn = document.getElementById('reset-edits');
+    const saveBtn = document.getElementById('save-edits');
+    const editButtonsGroup = document.getElementById('edit-buttons');
     const imageSizeSlider = document.getElementById('image-size-slider');
     const imageSizeValue = document.getElementById('image-size-value');
 
@@ -28,8 +30,7 @@ export function initEditor() {
         toggleBtn.textContent = isEditMode ? '✅ 편집 모드 끄기' : '✏️ 편집 모드 켜기';
         toggleBtn.style.background = isEditMode ? '#28a745' : '#8C002B';
         toggleBtn.style.borderColor = isEditMode ? '#28a745' : '#8C002B';
-        resetBtn.style.display = isEditMode ? 'block' : 'none';
-        downloadBtn.style.display = isEditMode ? 'block' : 'none';
+        editButtonsGroup.style.display = isEditMode ? 'flex' : 'none';
 
         setupEditableElements();
     });
@@ -105,6 +106,38 @@ export function initEditor() {
     // Download HTML
     downloadBtn.addEventListener('click', () => {
         downloadCurrentHTML();
+    });
+
+    // Save Edits
+    saveBtn.addEventListener('click', () => {
+        // 현재 모든 편집 가능한 요소의 텍스트 저장
+        document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+            if (!el.closest('#editor-controls') && !el.closest('#crop-modal')) {
+                saveTextEdit(el);
+            }
+        });
+
+        // 저장 확인 메시지
+        const message = document.createElement('div');
+        message.textContent = '✅ 저장되었습니다!';
+        message.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #28a745;
+            color: white;
+            padding: 20px 40px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            z-index: 10001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        `;
+        document.body.appendChild(message);
+        setTimeout(() => {
+            message.remove();
+        }, 2000);
     });
 
     // Reset Edits
