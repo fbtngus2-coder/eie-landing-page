@@ -534,13 +534,15 @@ img {
 
 .year-badge {
     position: absolute;
-    left: -70px;
+    left: -120px;
     top: 0;
+    width: 80px;
+    text-align: right;
     font-size: 1.5rem;
     font-weight: 900;
     color: var(--primary-color);
     font-family: var(--font-eng);
-    background: #fff;
+    background: transparent;
     padding: 5px 10px;
 }
 
@@ -769,5 +771,27 @@ img {
 
     .process-step::after {
         display: none;
+    }
+
+    /* History Timeline Mobile */
+    .timeline {
+        padding-left: 20px;
+        border-left: 2px solid #eee;
+    }
+
+    .year-badge {
+        position: relative;
+        left: 0;
+        top: 0;
+        width: auto;
+        text-align: left;
+        margin-bottom: 15px;
+        display: inline-block;
+        background: #fff;
+        padding: 5px 0;
+    }
+
+    .history-list li {
+        font-size: 0.95rem;
     }
 }
