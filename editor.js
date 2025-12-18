@@ -1,11 +1,11 @@
-// Cropper.js is loaded via CDN in index.html
-// Using global Cropper object
+import { supabase } from './supabaseClient.js'
+
+const STORAGE_BUCKET = 'landing-page-images'
+const TABLE_NAME = 'page_content'
 
 let isEditMode = false;
-let currentImageElement = null;
 let cropper = null;
-
-const STORAGE_KEY = 'eie-landing-edits';
+let currentImageElement = null;
 
 export function initEditor() {
     const toggleBtn = document.getElementById('toggle-edit-mode');
@@ -22,6 +22,7 @@ export function initEditor() {
     const imageSizeValue = document.getElementById('image-size-value');
 
     // 페이지 로드 시 저장된 편집 내용 복원
+    console.log('EiE Landing Page Loaded');
     restoreEdits();
 
     toggleBtn.addEventListener('click', () => {
@@ -37,156 +38,48 @@ export function initEditor() {
         setupEditableElements();
     });
 
-    // Handle Image Clicking
-    document.addEventListener('click', (e) => {
-        if (!isEditMode) return;
-
-        // Prevent default link behavior in edit mode
-        if (e.target.closest('a')) {
-            e.preventDefault();
-        }
-
-        if (e.target.tagName === 'IMG' && !e.target.closest('#crop-modal') && !e.target.closest('.logo')) {
-            openCropModal(e.target);
-        }
-    });
-
-    // Image Upload Handling
-    imageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                cropImageTarget.src = event.target.result;
-                if (cropper) cropper.destroy();
-                initCropper(); // Re-init with new image
-            };
-            reader.readAsDataURL(file);
-        }
-        // Reset input
-        imageInput.value = '';
-    });
-
-    // Cancel Crop
-    cropCancelBtn.addEventListener('click', () => {
-        closeModal();
-    });
-
-    // Image Size Slider
-    imageSizeSlider.addEventListener('input', (e) => {
-        const size = e.target.value;
-        imageSizeValue.textContent = `${size}%`;
-    });
-
-    // Apply Crop
-    cropApplyBtn.addEventListener('click', () => {
-        if (!cropper) return;
-
-        // Get cropped result
-        const canvas = cropper.getCroppedCanvas();
-        if (canvas && currentImageElement) {
-            currentImageElement.src = canvas.toDataURL(); // Update the image on page
-
-            // Apply size from slider
-            const size = imageSizeSlider.value;
-            currentImageElement.style.width = `${size}%`;
-            currentImageElement.style.height = 'auto';
-            currentImageElement.style.maxWidth = `${size}%`;
-
-            // Save to localStorage
-            saveImageEdit(currentImageElement);
-
-            // Optional: Flash effect to show update
-            currentImageElement.style.outline = '4px solid #00ff00';
-            setTimeout(() => {
-                currentImageElement.style.outline = '';
-            }, 500);
-        }
-        closeModal();
-    });
-
-    // Download HTML
-    downloadBtn.addEventListener('click', () => {
-        downloadCurrentHTML();
-    });
-
-    // Save Edits
-    saveBtn.addEventListener('click', () => {
-        // 현재 모든 편집 가능한 요소의 텍스트 저장
-        document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+    function setupEditableElements() {
+        document.querySelectorAll('h1, h2, h3, p, a.btn, li, span').forEach(el => {
             if (!el.closest('#editor-controls') && !el.closest('#crop-modal')) {
-                saveTextEdit(el);
+                el.contentEditable = isEditMode;
+                el.style.outline = isEditMode ? '1px dashed rgba(140, 0, 43, 0.3)' : '';
             }
         });
 
-        // 모든 이미지도 저장 (data-original-src가 있는 이미지만)
-        document.querySelectorAll('img[data-original-src]').forEach(img => {
-            if (!img.closest('#editor-controls') && !img.closest('#crop-modal')) {
-                saveImageEdit(img);
+        document.querySelectorAll('img').forEach(img => {
+            if (!img.closest('#editor-controls') && !img.closest('#crop-modal') && !img.closest('.logo')) {
+                if (isEditMode) {
+                    img.style.cursor = 'pointer';
+                    img.style.outline = '2px dashed rgba(140, 0, 43, 0.5)';
+                    img.crossOrigin = 'anonymous'; // CORS 문제 방지
+                    img.onclick = () => openImageEditor(img);
+                } else {
+                    img.style.cursor = '';
+                    img.style.outline = '';
+                    img.onclick = null;
+                }
             }
         });
-
-        // 저장 확인 메시지
-        const message = document.createElement('div');
-        message.textContent = '✅ 저장되었습니다!';
-        message.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #28a745;
-            color: white;
-            padding: 20px 40px;
-            border-radius: 8px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            z-index: 10001;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        `;
-        document.body.appendChild(message);
-        setTimeout(() => {
-            message.remove();
-        }, 2000);
-    });
-
-    // Reset Edits
-    resetBtn.addEventListener('click', () => {
-        if (confirm('모든 편집 내용을 초기화하시겠습니까?')) {
-            localStorage.removeItem(STORAGE_KEY);
-            location.reload();
-        }
-    });
-
-    function openCropModal(img) {
-        currentImageElement = img;
-        cropModal.style.display = 'flex';
-
-        // Determine aspect ratio from the target image's computed size
-        const rect = img.getBoundingClientRect();
-        const aspectRatio = rect.width / rect.height;
-
-        // Get current width percentage (if previously set) or default to 100
-        const currentWidth = img.style.width ? parseInt(img.style.width) : 100;
-        imageSizeSlider.value = currentWidth;
-        imageSizeValue.textContent = `${currentWidth}%`;
-
-        document.getElementById('crop-ratio-display').textContent = `현재 비율 고정: ${Math.round(rect.width)}x${Math.round(rect.height)} (${aspectRatio.toFixed(2)})`;
-
-        cropImageTarget.src = img.src;
-
-        // Initialize Cropper
-        if (cropper) cropper.destroy();
-        initCropper(aspectRatio);
     }
 
-    function initCropper(aspectRatio) {
+    function openImageEditor(img) {
+        currentImageElement = img;
+        cropModal.style.display = 'flex';
+        const imgSrc = img.src;
+        cropImageTarget.src = imgSrc;
+
+        if (cropper) {
+            cropper.destroy();
+        }
+
         cropper = new Cropper(cropImageTarget, {
-            aspectRatio: aspectRatio || NaN, // NaN means free crop if we didn't want to lock it
-            viewMode: 1, // Restrict crop box to canvas
-            autoCropArea: 1,
-            guides: true,
-            background: false,
+            aspectRatio: NaN,
+            viewMode: 1,
+            autoCropArea: 1
         });
+
+        imageSizeSlider.value = 100;
+        imageSizeValue.textContent = '100%';
     }
 
     function closeModal() {
@@ -197,123 +90,302 @@ export function initEditor() {
         }
         currentImageElement = null;
     }
-}
 
-function setupEditableElements() {
-    const textTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', '.btn'];
+    // Image Size Slider
+    imageSizeSlider.addEventListener('input', (e) => {
+        const size = e.target.value;
+        imageSizeValue.textContent = `${size}%`;
+    });
 
-    // Toggle contenteditable
-    document.querySelectorAll(textTags.join(',')).forEach(el => {
-        // Avoid editing system UI
-        if (el.closest('#editor-controls') || el.closest('#crop-modal')) return;
+    // Apply Crop
+    cropApplyBtn.addEventListener('click', async () => {
+        if (!cropper) return;
 
-        if (isEditMode) {
-            el.setAttribute('contenteditable', 'true');
-            el.classList.add('editable-element');
+        const canvas = cropper.getCroppedCanvas();
+        if (canvas && currentImageElement) {
+            try {
+                // 이미지를 Blob으로 변환
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 
-            // 텍스트 변경 시 자동 저장
-            el.addEventListener('blur', () => saveTextEdit(el));
-        } else {
-            el.removeAttribute('contenteditable');
-            el.classList.remove('editable-element');
+                // 파일명 생성
+                const filename = `image_${Date.now()}.png`;
+
+                // Supabase Storage에 업로드
+                const { data, error } = await supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .upload(filename, blob, {
+                        contentType: 'image/png',
+                        upsert: true
+                    });
+
+                if (error) throw error;
+
+                // Public URL 가져오기
+                const { data: { publicUrl } } = supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .getPublicUrl(filename);
+
+                console.log('✅ 업로드 성공! URL:', publicUrl);
+
+                // 이미지 src 업데이트
+                currentImageElement.src = publicUrl;
+
+                // 중요: srcset 속성이 있다면 제거 (반응형 이미지 충돌 방지)
+                if (currentImageElement.hasAttribute('srcset')) {
+                    console.log('⚠️ srcset 속성 감지됨. 제거합니다.');
+                    currentImageElement.removeAttribute('srcset');
+                }
+
+                // 크기 적용
+                const size = imageSizeSlider.value;
+                currentImageElement.style.width = `${size}%`;
+                currentImageElement.style.height = 'auto';
+                currentImageElement.style.maxWidth = `${size}%`;
+
+                // Flash effect
+                currentImageElement.style.outline = '4px solid #00ff00';
+                setTimeout(() => {
+                    if (currentImageElement) {
+                        currentImageElement.style.outline = '';
+                    }
+                }, 500);
+
+                alert('✅ 이미지가 업로드되었습니다! 💾 저장 버튼을 눌러 변경사항을 저장하세요.');
+            } catch (error) {
+                console.error('이미지 업로드 실패:', error);
+                alert('❌ 이미지 업로드에 실패했습니다: ' + error.message);
+            }
+        }
+        closeModal();
+    });
+
+    // 새 이미지 업로드 버튼 기능 복구
+    // 버튼 ID가 명확하지 않으므로 텍스트로 찾아서 연결하거나, 모달 내의 특정 버튼을 타겟팅
+    const uploadNewImageBtn = Array.from(cropModal.querySelectorAll('button')).find(btn => btn.textContent.includes('새 이미지 업로드') || btn.classList.contains('btn-secondary'));
+
+    if (uploadNewImageBtn) {
+        uploadNewImageBtn.onclick = () => imageInput.click();
+    }
+
+    // 파일 선택 시 Cropper 이미지 교체
+    imageInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (readerEvent) => {
+                if (cropper) {
+                    cropper.replace(readerEvent.target.result);
+                }
+                // 입력값 초기화 (동일 파일 재선택 가능하게)
+                imageInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    cropCancelBtn.addEventListener('click', () => {
+        closeModal();
+    });
+
+    // Download HTML
+    downloadBtn.addEventListener('click', () => {
+        downloadCurrentHTML();
+    });
+
+    // Reset Edits
+    resetBtn.addEventListener('click', async () => {
+        if (confirm('모든 편집 내용을 삭제하시겠습니까?')) {
+            try {
+                // Supabase에서 모든 데이터 삭제
+                const { error } = await supabase
+                    .from(TABLE_NAME)
+                    .delete()
+                    .neq('id', 0); // 모든 행 삭제
+
+                if (error) throw error;
+
+                location.reload();
+            } catch (error) {
+                console.error('초기화 실패:', error);
+                alert('❌ 초기화에 실패했습니다: ' + error.message);
+            }
+        }
+    });
+
+    // Save Edits
+    saveBtn.addEventListener('click', async () => {
+        try {
+            // 텍스트 저장
+            const textElements = document.querySelectorAll('[contenteditable="true"]');
+            for (const el of textElements) {
+                if (!el.closest('#editor-controls') && !el.closest('#crop-modal')) {
+                    await saveTextEdit(el);
+                }
+            }
+
+            // 이미지 크기 저장
+            const images = document.querySelectorAll('img');
+            for (const img of images) {
+                if (!img.closest('#editor-controls') && !img.closest('#crop-modal') && !img.closest('.logo')) {
+                    if (img.style.width || img.style.maxWidth) {
+                        await saveImageStyle(img);
+                    }
+                }
+            }
+
+            // 저장 확인 메시지
+            const message = document.createElement('div');
+            message.textContent = '✅ 저장되었습니다!';
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #28a745;
+                color: white;
+                padding: 20px 40px;
+                border-radius: 8px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                z-index: 10001;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            document.body.appendChild(message);
+            setTimeout(() => {
+                message.remove();
+            }, 2000);
+
+        } catch (error) {
+            console.error('저장 실패:', error);
+            alert('❌ 저장에 실패했습니다: ' + error.message);
         }
     });
 }
 
-function downloadCurrentHTML() {
-    // Clone document to clean up editor UI before saving
-    const clone = document.documentElement.cloneNode(true);
+async function saveTextEdit(element) {
+    const selector = getUniqueSelector(element);
+    const content = element.innerHTML;
 
-    // Remove editor controls and modals
-    const controls = clone.querySelector('#editor-controls');
-    const modal = clone.querySelector('#crop-modal');
-    if (controls) controls.remove();
-    if (modal) modal.remove();
+    try {
+        const { error } = await supabase
+            .from(TABLE_NAME)
+            .upsert({
+                content_type: 'text',
+                selector: selector,
+                value: content
+            }, {
+                onConflict: 'selector'
+            });
 
-    // Remove editable attributes and classes
-    const editables = clone.querySelectorAll('[contenteditable]');
-    editables.forEach(el => {
-        el.removeAttribute('contenteditable');
-        el.classList.remove('editable-element');
-    });
-
-    // Remove script tag that imports the editor (optional/tricky, maybe just leave it)
-
-    const htmlContent = clone.outerHTML;
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'index-edited.html';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-// localStorage 저장/복원 함수들
-function getStoredEdits() {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : { images: {}, texts: {} };
-}
-
-function saveImageEdit(imgElement) {
-    const edits = getStoredEdits();
-    const imgSrc = imgElement.getAttribute('src');
-    const originalSrc = imgElement.dataset.originalSrc || imgSrc;
-
-    // 첫 편집 시 원본 src 저장
-    if (!imgElement.dataset.originalSrc) {
-        imgElement.dataset.originalSrc = originalSrc;
+        if (error) throw error;
+    } catch (error) {
+        console.error('텍스트 저장 실패:', selector, error);
     }
+}
 
-    // Base64 이미지는 localStorage 용량을 많이 차지하므로 크기만 저장
-    // 크롭된 이미지는 저장하지 않고, 크기 조절만 저장
-    edits.images[originalSrc] = {
+async function saveImageStyle(imgElement) {
+    const selector = getUniqueSelector(imgElement);
+    const styleData = {
+        src: imgElement.src,
         width: imgElement.style.width,
         height: imgElement.style.height,
         maxWidth: imgElement.style.maxWidth
     };
 
     try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(edits));
-    } catch (e) {
-        if (e.name === 'QuotaExceededError') {
-            console.warn('localStorage 용량 초과. 이전 데이터를 삭제합니다.');
-            localStorage.removeItem(STORAGE_KEY);
-            // 재시도
-            edits.images = { [originalSrc]: edits.images[originalSrc] };
-            edits.texts = {};
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(edits));
-        }
+        const { error } = await supabase
+            .from(TABLE_NAME)
+            .upsert({
+                content_type: 'image',
+                selector: selector,
+                value: JSON.stringify(styleData)
+            }, {
+                onConflict: 'selector'
+            });
+
+        if (error) throw error;
+    } catch (error) {
+        console.error('이미지 스타일 저장 실패:', selector, error);
     }
 }
 
-function saveTextEdit(element) {
-    const edits = getStoredEdits();
-    const path = getElementPath(element);
+async function restoreEdits() {
+    try {
+        console.log('=== 복원 시작 ===');
 
-    edits.texts[path] = element.innerHTML;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(edits));
+        // Supabase에서 모든 데이터 가져오기
+        const { data, error } = await supabase
+            .from(TABLE_NAME)
+            .select('*');
+
+        if (error) throw error;
+
+        console.log('불러온 데이터:', data);
+
+        if (!data || data.length === 0) {
+            console.log('저장된 데이터가 없습니다.');
+            return;
+        }
+
+        let restoredTexts = 0;
+        let restoredImages = 0;
+
+        for (const item of data) {
+            try {
+                const element = document.querySelector(item.selector);
+
+                if (!element) {
+                    console.warn('요소를 찾을 수 없음:', item.selector);
+                    continue;
+                }
+
+                if (item.content_type === 'text') {
+                    element.innerHTML = item.value;
+                    restoredTexts++;
+                    console.log('✅ 텍스트 복원:', item.selector);
+                } else if (item.content_type === 'image') {
+                    const styleData = JSON.parse(item.value);
+                    if (styleData.src) {
+                        element.src = styleData.src;
+                        // 복원 시에도 srcset 제거
+                        if (element.hasAttribute('srcset')) element.removeAttribute('srcset');
+                    }
+                    if (styleData.width) element.style.width = styleData.width;
+                    if (styleData.height) element.style.height = styleData.height;
+                    if (styleData.maxWidth) element.style.maxWidth = styleData.maxWidth;
+                    restoredImages++;
+                    console.log('✅ 이미지 복원:', item.selector);
+                }
+            } catch (err) {
+                console.error('복원 실패:', item.selector, err);
+            }
+        }
+
+        console.log(`=== 복원 완료: 텍스트 ${restoredTexts}개, 이미지 ${restoredImages}개 ===`);
+
+    } catch (error) {
+        console.error('데이터 불러오기 실패:', error);
+    }
 }
 
-function getElementPath(element) {
+function getUniqueSelector(element) {
+    if (element.id) {
+        return `#${element.id}`;
+    }
+
     const path = [];
     let current = element;
 
     while (current && current !== document.body) {
         let selector = current.tagName.toLowerCase();
 
-        if (current.id) {
-            selector += `#${current.id}`;
-        } else if (current.className) {
-            const classes = Array.from(current.classList)
-                .filter(c => !c.startsWith('editable'))
-                .join('.');
-            if (classes) selector += `.${classes}`;
+        if (current.className && typeof current.className === 'string') {
+            const classes = current.className.trim().split(/\s+/).filter(c => c);
+            if (classes.length > 0) {
+                selector += '.' + classes.join('.');
+            }
         }
 
-        // 형제 중 몇 번째인지 추가
         const siblings = Array.from(current.parentNode?.children || []);
         const index = siblings.indexOf(current);
         if (siblings.length > 1) {
@@ -327,53 +399,15 @@ function getElementPath(element) {
     return path.join(' > ');
 }
 
-function restoreEdits() {
-    const edits = getStoredEdits();
-
-    // 이미지 복원
-    Object.keys(edits.images).forEach(originalSrc => {
-        const imgData = edits.images[originalSrc];
-
-        // 다양한 방법으로 이미지 찾기
-        let img = document.querySelector(`img[data-original-src="${originalSrc}"]`);
-
-        if (!img) {
-            // data-original-src가 없으면 src로 찾기
-            img = document.querySelector(`img[src="${originalSrc}"]`);
-        }
-
-        if (!img) {
-            // src 경로의 마지막 부분으로만 찾기
-            const filename = originalSrc.split('/').pop();
-            const allImages = document.querySelectorAll('img');
-            for (const image of allImages) {
-                const imgSrc = image.getAttribute('src') || image.src;
-                if (imgSrc && imgSrc.includes(filename)) {
-                    img = image;
-                    break;
-                }
-            }
-        }
-
-        if (img && !img.closest('#editor-controls') && !img.closest('#crop-modal')) {
-            img.dataset.originalSrc = originalSrc;
-            // Base64 src는 복원하지 않음 (localStorage 용량 문제)
-            // 크기만 복원
-            if (imgData.width) img.style.width = imgData.width;
-            if (imgData.height) img.style.height = imgData.height;
-            if (imgData.maxWidth) img.style.maxWidth = imgData.maxWidth;
-        }
-    });
-
-    // 텍스트 복원
-    Object.keys(edits.texts).forEach(path => {
-        try {
-            const element = document.querySelector(path);
-            if (element && !element.closest('#editor-controls') && !element.closest('#crop-modal')) {
-                element.innerHTML = edits.texts[path];
-            }
-        } catch (e) {
-            console.warn('텍스트 복원 실패:', path, e);
-        }
-    });
+function downloadCurrentHTML() {
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'eie-landing-page.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
