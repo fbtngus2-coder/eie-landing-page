@@ -4,6 +4,17 @@ import { initEditor } from './editor.js';
 console.log('EiE Landing Page Loaded');
 initEditor();
 
+// Mobile Menu Logic
+const menuToggle = document.getElementById('menu-toggle');
+const header = document.querySelector('.header');
+
+if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+        header.classList.toggle('menu-open');
+        // Optional: Change icon or animate
+    });
+}
+
 // History Tab Logic
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
@@ -87,21 +98,23 @@ function initBrochure() {
         return;
     }
 
+    const isMobile = window.innerWidth < 768;
+
     const pageFlip = new St.PageFlip(flipbookEl, {
         width: 550, // Base page width
         height: 755, // 881x1210 ratio (~0.728) matches image exactly
-        size: 'fixed', // Strict size
+        size: isMobile ? 'stretch' : 'fixed', // Stretch on mobile to fit screen width
         // Remove min/max width/height to prevent scaling behavior that creates gaps
-        // minWidth: 300,
-        // maxWidth: 1000,
-        // minHeight: 400,
-        // maxHeight: 1500,
+        minWidth: 300,
+        maxWidth: 1000,
+        minHeight: 400,
+        maxHeight: 1500,
         maxShadowOpacity: 0.2,
         showCover: false,
         mobileScrollSupport: false,
-        usePortrait: false,
+        usePortrait: isMobile, // Force single page on mobile
         startPage: 0,
-        autoSize: false, // Turn off auto-size to prevent container stretching beyond page
+        autoSize: isMobile, // Auto size on mobile
     });
 
     pageFlip.loadFromHTML(document.querySelectorAll('.page'));
