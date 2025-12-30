@@ -1328,4 +1328,9 @@ img {
         font-size: 1.5rem;
         padding: 24px 48px;
     }
+
+    /* Hide mobile-only line breaks on PC */
+    .mobile-br {
+        display: none;
+    }
 }
