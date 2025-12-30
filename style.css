@@ -1290,6 +1290,11 @@ img {
         width: 100%;
         display: block;
     }
+
+    /* Utility: Force left alignment on mobile */
+    .mobile-text-left {
+        text-align: left !important;
+    }
 }
 
 /* PC Optimization: Closing Section Layout */
