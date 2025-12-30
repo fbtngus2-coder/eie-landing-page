@@ -21,7 +21,23 @@ export function initEditor() {
 
     // 페이지 로드 시 저장된 편집 내용 복원
     console.log('EiE Landing Page Loaded');
-    restoreEdits();
+    restoreEdits().then(() => {
+        cleanupLegacyStyles(); // Force cleanup of ALL elements
+        setupEditableElements();
+    });
+
+    function cleanupLegacyStyles() {
+        // Clean up outline/cursor from ALL elements that might have been affected
+        document.querySelectorAll('*').forEach(el => {
+            if (el.style.outline && el.style.outline.includes('dashed')) {
+                el.style.outline = '';
+            }
+            if (el.style.cursor === 'text' || (el.tagName !== 'A' && el.tagName !== 'BUTTON' && el.style.cursor === 'pointer')) {
+                // Only remove pointer cursor if it's not a link/button, as we used it for images
+                if (el.tagName === 'IMG') el.style.cursor = '';
+            }
+        });
+    }
 
     toggleBtn.addEventListener('click', () => {
         isEditMode = !isEditMode;
@@ -36,24 +52,100 @@ export function initEditor() {
         setupEditableElements();
     });
 
-    function setupEditableElements() {
-        document.querySelectorAll('h1, h2, h3, p, a.btn, li, span').forEach(el => {
-            if (!el.closest('#editor-controls') && !el.closest('#crop-modal')) {
-                el.contentEditable = isEditMode;
-                el.style.outline = isEditMode ? '1px dashed rgba(140, 0, 43, 0.3)' : '';
+    setupRichTextToolbar();
+
+    function setupRichTextToolbar() {
+        const toolbar = document.getElementById('text-editor-toolbar');
+        if (!toolbar) return;
+
+        const cmdBold = document.getElementById('cmd-bold');
+        const cmdColor = document.getElementById('cmd-color');
+        const cmdFontSize = document.getElementById('cmd-fontsize');
+        const cmdFontName = document.getElementById('cmd-fontname');
+
+        // Actions
+        cmdBold.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent losing selection
+            document.execCommand('bold');
+        });
+
+        cmdColor.addEventListener('input', (e) => {
+            document.execCommand('foreColor', false, e.target.value);
+        });
+
+        cmdFontSize.addEventListener('change', (e) => {
+            // execCommand fontSize is 1-7
+            if (e.target.value) {
+                document.execCommand('fontSize', false, e.target.value);
+                e.target.value = ''; // Reset
             }
         });
 
+        cmdFontName.addEventListener('change', (e) => {
+            if (e.target.value) {
+                document.execCommand('fontName', false, e.target.value);
+                e.target.value = ''; // Reset
+            }
+        });
+
+        // Show/Hide Logic
+        document.addEventListener('selectionchange', () => {
+            if (!isEditMode) {
+                toolbar.style.display = 'none';
+                return;
+            }
+
+            const selection = window.getSelection();
+            if (selection.isCollapsed) {
+                toolbar.style.display = 'none';
+                return;
+            }
+
+            const range = selection.getRangeAt(0);
+            const container = range.commonAncestorContainer.nodeType === 1 ? range.commonAncestorContainer : range.commonAncestorContainer.parentElement;
+
+            // Check if selection is within an editable element
+            if (!container.closest('[contenteditable="true"]')) {
+                toolbar.style.display = 'none';
+                return;
+            }
+
+            // Position Toolbar
+            const rect = range.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+            toolbar.style.display = 'flex';
+            toolbar.style.top = `${rect.top + scrollTop - 50}px`; // Moved up a bit
+            toolbar.style.left = `${rect.left + scrollLeft + (rect.width / 2) - (toolbar.offsetWidth / 2)}px`;
+        });
+    }
+
+    function setupEditableElements() {
+        // Text Elements
+        document.querySelectorAll('h1, h2, h3, p, a.btn, li').forEach(el => {
+            if (!el.closest('#editor-controls') && !el.closest('#crop-modal')) {
+                el.contentEditable = isEditMode;
+                // Clean up any legacy inline styles
+                if (el.style.outline && el.style.outline.includes('dashed')) {
+                    el.style.outline = '';
+                }
+            }
+        });
+
+        // Image Elements
         document.querySelectorAll('img').forEach(img => {
             if (!img.closest('#editor-controls') && !img.closest('#crop-modal') && !img.closest('.logo')) {
                 if (isEditMode) {
-                    img.style.cursor = 'pointer';
-                    img.style.outline = '2px dashed rgba(140, 0, 43, 0.5)';
                     img.onclick = () => openImageEditor(img);
                 } else {
-                    img.style.cursor = '';
-                    img.style.outline = '';
                     img.onclick = null;
+                }
+
+                // Clean up any legacy inline styles
+                if (img.style.outline && img.style.outline.includes('dashed')) {
+                    img.style.outline = '';
+                    img.style.cursor = '';
                 }
             }
         });
@@ -151,6 +243,33 @@ export function initEditor() {
     cropCancelBtn.addEventListener('click', () => {
         closeModal();
     });
+
+    // New Image Upload
+    if (imageInput) {
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (readerEvent) => {
+                    const newImageSrc = readerEvent.target.result;
+                    cropImageTarget.src = newImageSrc;
+
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+
+                    cropper = new Cropper(cropImageTarget, {
+                        aspectRatio: NaN,
+                        viewMode: 1,
+                        autoCropArea: 1
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+            // Reset input so same file can be selected again
+            e.target.value = '';
+        });
+    }
 
     // Save Edits
     saveBtn.addEventListener('click', async () => {
@@ -311,6 +430,11 @@ function getUniqueSelector(element) {
     let current = element;
 
     while (current && current !== document.body) {
+        if (current.id) {
+            path.unshift(`#${current.id}`);
+            break;
+        }
+
         let selector = current.tagName.toLowerCase();
 
         if (current.className && typeof current.className === 'string') {
@@ -332,5 +456,3 @@ function getUniqueSelector(element) {
 
     return path.join(' > ');
 }
-
-

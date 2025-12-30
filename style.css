@@ -346,6 +346,93 @@ img {
     word-break: keep-all;
 }
 
+/* Support Section */
+.support-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.support-item {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+}
+
+.support-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(140, 0, 43, 0.15);
+    border-color: rgba(140, 0, 43, 0.1);
+}
+
+.support-img {
+    height: 180px;
+    overflow: hidden;
+    background: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.support-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.5s;
+}
+
+.support-item:hover .support-img img {
+    transform: scale(1.1);
+}
+
+.support-text {
+    padding: 25px 20px;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.support-text h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.support-text p {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.5;
+    word-break: keep-all;
+}
+
+/* Response for Support Section */
+@media (max-width: 1024px) {
+    .support-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .support-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .support-img {
+        height: 200px;
+    }
+}
+
 /* Strength Section */
 .strength {
     background: #232323;
@@ -353,9 +440,6 @@ img {
     color: #fff;
 }
 
-.text-white-shadow {
-    /* text-shadow: 0 2px 4px rgba(0,0,0,0.5); */
-}
 
 .strength-grid {
     display: grid;
@@ -413,15 +497,17 @@ img {
 
 .process-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    /* Reduced gap */
     margin-top: 40px;
 }
 
 .process-step {
     background: #f8f9fa;
-    border-radius: 16px;
-    padding: 30px;
+    border-radius: 12px;
+    padding: 20px 10px;
+    /* Reduced padding */
     position: relative;
     border: 1px solid rgba(0, 0, 0, 0.03);
     transition: all 0.3s ease;
@@ -429,6 +515,7 @@ img {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    height: 100%;
 }
 
 .process-step:hover {
@@ -441,47 +528,98 @@ img {
 .process-step::after {
     content: '→';
     position: absolute;
-    right: -20px;
+    right: -12px;
+    /* Adjusted position */
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: #ddd;
     font-weight: 300;
+    z-index: 10;
 }
 
-.process-step:nth-child(3n)::after,
+/* Hide arrow on the last child */
 .process-step:last-child::after {
     display: none;
 }
 
+/* Override previous nth-child rule if it existed, simply relying on last-child is enough for single row */
+
 .step-icon {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    /* Smaller icon */
+    height: 40px;
     background: var(--primary-color);
     color: #fff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 800;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     font-family: var(--font-eng);
     box-shadow: 0 4px 10px rgba(140, 0, 43, 0.2);
 }
 
 .step-content h3 {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+    /* Smaller title */
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: #222;
+    word-break: keep-all;
 }
 
 .step-content p {
     color: #666;
-    font-size: 0.95rem;
-    line-height: 1.6;
+    font-size: 0.85rem;
+    /* Smaller text */
+    line-height: 1.4;
     word-break: keep-all;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 1024px) {
+    .process-grid {
+        grid-template-columns: repeat(3, 1fr);
+        /* 2 rows of 3 */
+        gap: 20px;
+    }
+
+    .process-step:nth-child(3n)::after {
+        display: none;
+        /* Hide arrow at end of first row in 3-col layout */
+    }
+
+    .process-step:last-child::after {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .process-grid {
+        grid-template-columns: 1fr;
+        /* Stack on mobile */
+    }
+
+    .process-step::after {
+        content: '↓';
+        /* Arrow points down on mobile */
+        right: 50%;
+        top: auto;
+        bottom: -25px;
+        transform: translateX(50%);
+    }
+
+    .process-step {
+        margin-bottom: 30px;
+        /* Space for arrow */
+    }
+
+    .process-step:last-child {
+        margin-bottom: 0;
+    }
 }
 
 /* History Section */
@@ -992,8 +1130,21 @@ img {
     left: 20px;
 }
 
+
 .brochure-btn.next {
     right: 20px;
+}
+
+/* Scroll Animation Utility */
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-animate.active {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 @media (max-width: 768px) {
