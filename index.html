@@ -16,64 +16,8 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Montserrat:wght@400;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
-</head>
 
-<body>
-    <!-- Editor Controls -->
-    <div id="editor-controls"
-        style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; gap: 10px; flex-direction: column; align-items: flex-end;">
-        <button id="toggle-edit-mode" class="btn btn-primary" style="box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-            ✏️ 편집 모드 켜기
-        </button>
-        <div style="display: none; gap: 10px;" id="edit-buttons">
-            <button id="save-edits" class="btn btn-primary" style="background: #28a745; border: 1px solid #28a745;">
-                💾 저장
-            </button>
-        </div>
-    </div>
 
-    <!-- Image Crop Modal -->
-    <div id="crop-modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
-        <div
-            style="background: #fff; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column;">
-            <h3 style="margin-bottom: 15px; font-weight: bold;">이미지 편집</h3>
-            <div
-                style="flex: 1; min-height: 400px; background: #f5f5f5; margin-bottom: 20px; overflow: hidden; position: relative;">
-                <img id="crop-image-target" style="display: block; max-width: 100%;" />
-            </div>
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
-                    이미지 크기 조절: <span id="image-size-value" style="color: #8C002B;">100%</span>
-                </label>
-                <input type="range" id="image-size-slider" min="50" max="150" value="100" step="5"
-                    style="width: 100%; cursor: pointer;" />
-                <div
-                    style="display: flex; justify-content: space-between; font-size: 0.85em; color: #999; margin-top: 5px;">
-                    <span>50%</span>
-                    <span>100%</span>
-                    <span>150%</span>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <span id="crop-ratio-display" style="font-size: 0.9em; color: #666;"></span>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button id="crop-cancel" class="btn" style="background: #ccc; border-color: #ccc;">취소</button>
-                    <div style="position: relative;">
-                        <button class="btn btn-primary">새 이미지 업로드</button>
-                        <input type="file" id="image-upload-input" accept="image/*"
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
-                    </div>
-                    <button id="crop-apply" class="btn btn-primary">적용하기</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <!-- Header -->
     <header class="header">
         <div class="container header-container">
@@ -90,7 +34,7 @@
                 <a href="https://www.eie.co.kr/expression/" target="_blank">EiE 표현영어</a>
                 <a href="https://www.eie.co.kr/speech/" target="_blank">국제 영어 말하기대회</a>
             </nav>
-            <a href="#consulting" class="btn btn-primary">가맹 상담 무료 신청 ></a>
+            <a href="#consulting" class="btn btn-primary">가맹 상담 신청 ></a>
         </div>
     </header>
 
@@ -100,15 +44,15 @@
         <div class="container hero-content">
             <h2 class="hero-subtitle">누구와 함께하느냐가 결과를 바꿉니다</h2>
             <h1 class="hero-title">
-                고려대학교 교수진이 검증한<br class="pc-only" />
-                대한민국 영어 교육의 기준
+                고려대학교가 검증한<br />
+                영어 교육의 기준
             </h1>
             <p class="hero-desc">
-                계약부터 운영 안정화까지 책임지는 파트너십.<br class="pc-only" />
+                계약부터 운영 안정화까지 책임지는 파트너십.<br />
                 EiE와 시작하십시오.
             </p>
             <div class="hero-cta">
-                <a href="#consulting" class="btn btn-lg btn-primary">가맹 상담 무료 신청하기 ></a>
+                <a href="#consulting" class="btn btn-lg btn-primary">가맹 상담 신청하기 ></a>
             </div>
         </div>
     </section>
@@ -118,22 +62,23 @@
         <div class="container">
             <div class="intro-grid">
                 <div class="intro-image scroll-animate">
-                    <img src="/assets/고려대학교 사진/세로사진.jpg" alt="고려대학교 전경" />
+                    <img src="/assets/고려대학교 사진/세로사진.jpg" alt="고려대학교 전경">
                 </div>
                 <div class="intro-text scroll-animate" style="transition-delay: 0.2s">
                     <h3 class="section-subtitle text-primary">Why EiE?</h3>
-                    <h2 class="section-title">왜, EiE는 단순한<br class="pc-only" />프랜차이즈가 아닐까요?</h2>
+                    <h2 class="section-title">EiE는 단순한<br>
+                        프랜차이즈가 아닙니다.</h2>
                     <div class="intro-desc">
                         <p>
-                            EiE는 브랜드 이름만 빌려주는 곳이 아닙니다.<br class="pc-only" />
-                            <strong>국내 최고 명문 고려대학교</strong>의 외국어교육 교수법과<br class="pc-only" />
+                            EiE는 브랜드 이름만 빌려주는 곳이 아닙니다. <br class="pc-only">
+                            <strong>국내 최고 명문 고려대학교</strong>의 외국어교육 교수법과 <br class="pc-only">
                             수십 년간 축적된 교육 현장 중심의 노하우를 집약했습니다.
                         </p>
                         <p>
-                            단순한 교재 공급을 넘어,<br class="pc-only" />
-                            '실제 학원 현장에서 검증된 커리큘럼'과<br class="pc-only" />
-                            '운영 효율을 극대화한 시스템'으로<br class="pc-only" />
-                            초보 원장님도, 경력 원장님도 흔들림 없이<br class="pc-only" />
+                            단순한 교재 공급을 넘어, <br class="pc-only">
+                            '실제 학원 현장에서 검증된 커리큘럼'과 <br class="pc-only">
+                            '운영 효율을 극대화한 시스템'으로 <br class="pc-only">
+                            초보 원장님도, 경력 원장님도 흔들림 없이 <br class="pc-only">
                             성공할 수 있도록 설계되었습니다.
                         </p>
                     </div>
@@ -147,18 +92,18 @@
         <div class="container">
             <div class="text-center mb-60">
                 <h3 class="section-subtitle text-primary">Core Competency</h3>
-                <h2 class="section-title">EiE만의 4가지 핵심 전략</h2>
+                <h2 class="section-title">성공을 위한 EiE만의 4가지 핵심 전략</h2>
             </div>
 
             <!-- Feature 1: Trust -->
             <div class="feature-item scroll-animate">
                 <div class="feature-img">
-                    <img src="/assets/고려대학교 로고/호랑이로고.png" alt="고려대학교 호랑이 로고"
-                        style="max-width: 300px; margin: 0 auto;" />
+                    <img src="https://vuonnshhvyphssdoxrof.supabase.co/storage/v1/object/public/landing-page-images/image_1766992879022.png"
+                        alt="고려대학교 호랑이 로고" style="max-width: 100%; margin: 0px auto; width: 100%; height: auto;">
                 </div>
                 <div class="feature-text">
                     <div class="feature-label">01. 신뢰 (Trust)</div>
-                    <h3>고려대 교수진이 검증한<br class="pc-only" />전문 프로그램</h3>
+                    <h3>고려대 교수진이 검증한<br>전문 프로그램</h3>
                     <p>
                         학부모님이 가장 먼저 신뢰하는 브랜드 파워에는 이유가 있습니다.
                         고려대학교 교수진이 직접 기획 및 감수에 참여하여 공신력을 확보했습니다.
@@ -171,11 +116,12 @@
             <!-- Feature 2: Efficiency -->
             <div class="feature-item reverse scroll-animate">
                 <div class="feature-img">
-                    <img src="/assets/커리큘럼/MEC.png" alt="MEC 커리큘럼" />
+                    <img src="https://vuonnshhvyphssdoxrof.supabase.co/storage/v1/object/public/landing-page-images/image_1766992823834.png"
+                        alt="MEC 커리큘럼" style="width: 100%; height: auto; max-width: 100%;">
                 </div>
                 <div class="feature-text">
                     <div class="feature-label">02. 효율 (Efficiency)</div>
-                    <h3>수업 부담은 줄이고,<br class="pc-only" />교육 효과는 높이는 수업 설계</h3>
+                    <h3>수업 부담은 줄이고,<br>교육 효과는 높이는 수업 설계</h3>
                     <p>
                         원장님과 강사님의 업무 피로도를 획기적으로 낮췄습니다.
                         본사가 제공하는 표준화된 수업 매뉴얼과 온·오프라인 블렌디드 러닝 시스템은
@@ -187,11 +133,12 @@
             <!-- Feature 3: Partnership -->
             <div class="feature-item scroll-animate">
                 <div class="feature-img">
-                    <img src="/assets/원장단, 세미나 등/2_4i9Ud018svc1recopnpnig5w_eooyax.jpg" alt="가맹 상담 및 파트너십" />
+                    <img src="https://vuonnshhvyphssdoxrof.supabase.co/storage/v1/object/public/landing-page-images/image_1766990713148.png"
+                        alt="가맹 상담 및 파트너십" style="width: 100%; height: auto; max-width: 100%;">
                 </div>
                 <div class="feature-text">
                     <div class="feature-label">03. 동행 (Partnership)</div>
-                    <h3>계약부터 안정화까지,<br class="pc-only" />'진짜' 파트너십</h3>
+                    <h3>계약부터 안정화까지,<br>'진짜' 파트너십</h3>
                     <p>
                         "오픈하고 나면 끝 아닌가요?" EiE는 다릅니다.
                         상권 분석, 인테리어, 강사 교육, 그리고 개원 후 안정화까지
@@ -204,11 +151,12 @@
             <!-- Feature 4: Support -->
             <div class="feature-item reverse scroll-animate">
                 <div class="feature-img">
-                    <img src="/assets/홍보물/2024_EiE_포스터(약속).jpg" alt="마케팅 지원 포스터" />
+                    <img src="https://vuonnshhvyphssdoxrof.supabase.co/storage/v1/object/public/landing-page-images/image_1766990424515.png"
+                        alt="마케팅 지원 포스터" style="width: 100%; height: auto; max-width: 100%;">
                 </div>
                 <div class="feature-text">
                     <div class="feature-label">04. 지원 (Support)</div>
-                    <h3>끊임없이 제공되는<br class="pc-only" />마케팅 솔루션</h3>
+                    <h3>끊임없이 제공되는<br>마케팅 솔루션</h3>
                     <p>
                         시기별, 이슈별로 학원 운영에 필요한 고퀄리티 홍보물과 마케팅 자료를
                         지속적으로 제공합니다. 트렌드에 뒤처지지 않는 디자인과 콘텐츠로
@@ -224,95 +172,96 @@
         <div class="container">
             <div class="text-center mb-60">
                 <h3 class="section-subtitle text-primary">Franchise Support</h3>
-                <h2 class="section-title">가맹점 성공을 위한<br class="pc-only" /> 8가지 핵심 지원</h2>
+                <h2 class="section-title">성공을 위한 핵심 지원</h2>
             </div>
 
             <div class="support-grid">
                 <!-- Item 1 -->
                 <div class="support-item scroll-animate">
                     <div class="support-img">
-                        <img src="/assets/support/brand_usage.gif" alt="고려대학교 브랜드 사용" />
+                        <img src="/assets/support/brand_usage.gif" alt="고려대학교 브랜드 사용">
                     </div>
                     <div class="support-text">
-                        <h3>브랜드 파워</h3>
-                        <p>고려대학교 브랜드 사용</p>
+                        <h3>강력한 고려대학교 브랜드</h3>
                     </div>
                 </div>
 
                 <!-- Item 2 -->
                 <div class="support-item scroll-animate" style="transition-delay: 0.1s">
                     <div class="support-img">
-                        <img src="/assets/support/expert_assignment.png" alt="담당 전문가 배정" />
+                        <img src="/assets/support/expert_assignment.png" alt="담당 전문가 배정">
                     </div>
                     <div class="support-text">
-                        <h3>밀착 케어</h3>
-                        <p>담당 전문가 배정<br>(지역조사부터 안정화까지)</p>
+                        <h3>담당 전문가 배정</h3>
+                        <p>지역조사부터 개원 이후에도 계속되는 컨설팅</p>
                     </div>
                 </div>
 
                 <!-- Item 3 -->
                 <div class="support-item scroll-animate" style="transition-delay: 0.2s">
                     <div class="support-img">
-                        <img src="/assets/support/online_marketing.png" alt="온라인 마케팅 지원" />
+                        <img src="/assets/support/online_marketing.png" alt="온라인 마케팅 지원">
                     </div>
                     <div class="support-text">
-                        <h3>마케팅 지원</h3>
-                        <p>본사 차원의<br>온라인 마케팅 지원</p>
+                        <h3>전방위 마케팅 지원</h3>
+                        <p>온라인 마케팅, 학부모 설명회 등 전방위적 마케팅 지원</p>
                     </div>
                 </div>
 
                 <!-- Item 4 -->
                 <div class="support-item scroll-animate" style="transition-delay: 0.3s">
                     <div class="support-img">
-                        <img src="/assets/support/quarterly_promotion.png" alt="분기별 홍보물 시안 제공" />
+                        <img src="/assets/support/quarterly_promotion.png" alt="분기별 홍보물 시안 제공">
                     </div>
                     <div class="support-text">
-                        <h3>디자인 지원</h3>
-                        <p>분기별 고퀄리티<br>홍보물 시안 제공</p>
+                        <h3>분기별 홍보물 시안 제공</h3>
+                        <p>포스터, 전단지, 배너 등 다양한 홍보 시안 제공</p>
                     </div>
                 </div>
 
                 <!-- Item 5 -->
                 <div class="support-item scroll-animate" style="transition-delay: 0.1s">
                     <div class="support-img">
-                        <img src="/assets/support/speech_contest.jpg" alt="EiE 국제 영어 말하기 대회 참여" />
+                        <img src="https://vuonnshhvyphssdoxrof.supabase.co/storage/v1/object/public/landing-page-images/image_1767064042858.png"
+                            alt="EiE 국제 영어 말하기 대회 참여" style="width: 100%; height: auto; max-width: 100%;">
                     </div>
                     <div class="support-text">
-                        <h3>동기 부여</h3>
-                        <p>EiE 국제 영어<br>말하기 대회 참여 기회</p>
+                        <h3>EiE 국제 영어 말하기 대회</h3>
                     </div>
                 </div>
 
                 <!-- Item 6 -->
                 <div class="support-item scroll-animate" style="transition-delay: 0.2s">
                     <div class="support-img">
-                        <img src="/assets/support/mentoring_program.png" alt="교수원장단 운영" />
+                        <img src="/assets/support/mentoring_program.png" alt="교수원장단 운영">
                     </div>
                     <div class="support-text">
-                        <h3>멘토링 프로그램</h3>
-                        <p>교수원장단 운영<br>(신규 가맹점 멘토링)</p>
+                        <h3>교육 프로그램</h3>
+                        <p>교수원장단, 전문가 양성 프로그램, 실무 교육, 전략 컨설팅 지속 제공</p>
                     </div>
                 </div>
 
                 <!-- Item 7 -->
                 <div class="support-item scroll-animate" style="transition-delay: 0.3s">
                     <div class="support-img">
-                        <img src="/assets/support/rnd_team.png" alt="본사 R&D팀 운영" />
+                        <img src="/assets/support/rnd_team.png" alt="본사 R&D팀 운영">
                     </div>
                     <div class="support-text">
-                        <h3>지속적 연구</h3>
-                        <p>본사 전문 R&D팀 운영<br>(커리큘럼/교재 개발)</p>
+                        <h3>본사 R&D팀 운영</h3>
+                        <p>매년 트렌드에 맞는 교재 및
+                        <div>온라인 프로그램 개발</div>
+                        </p>
                     </div>
                 </div>
 
                 <!-- Item 8 -->
                 <div class="support-item scroll-animate" style="transition-delay: 0.4s">
                     <div class="support-img">
-                        <img src="/assets/support/initial_supply.png" alt="초도물품 지급" />
+                        <img src="/assets/support/initial_supply.png" alt="초도물품 지급">
                     </div>
                     <div class="support-text">
-                        <h3>오픈 지원</h3>
-                        <p>200만원 상당<br>초도물품 지급</p>
+                        <h3>초도물품 지급</h3>
+                        <p>200만원 상당 초도물품 지급</p>
                     </div>
                 </div>
             </div>
@@ -330,7 +279,7 @@
             <div class="strength-grid">
                 <div class="strength-card scroll-animate">
                     <div class="strength-img">
-                        <img src="/assets/말하기대회 사진/말하기대회.jpg" alt="말하기 대회" />
+                        <img src="/assets/말하기대회 사진/말하기대회.jpg" alt="말하기 대회">
                     </div>
                     <div class="strength-content">
                         <h3>🏆 국내 최대 규모 '전국 영어 말하기 대회'</h3>
@@ -346,10 +295,11 @@
                     <div class="strength-img">
                         <!-- Using a reliable image from search results if available, e.g. one of the seminar/community photos -->
                         <!-- Assuming file exists based on previous listing, or fallback to another known image -->
-                        <img src="/assets/원장단, 세미나 등/3_a8gUd018svcebljs3o0fn1g_dc34kb.jpg" alt="원장님 커뮤니티" />
+                        <img src="/assets/원장단, 세미나 등/모자이크 추가.jpg" alt="원장님 커뮤니티"
+                            style="width: 100%; height: auto; max-width: 100%;">
                     </div>
                     <div class="strength-content">
-                        <h3>🤝 선배 원장님과 함께하는 '지역 분원장 커뮤니티'</h3>
+                        <h3>🤝 지역별 EiE 선배 원장님과 함께하는 <br>'지역 분원장 커뮤니티'</h3>
                         <p>
                             혼자 고민하지 마세요. 지역별 정기 모임과 분원장 커뮤니티를 통해
                             성공 노하우를 공유받고, 서로 끌어주고 밀어주는 끈끈한 네트워크가
@@ -432,41 +382,25 @@
     <!-- Closing & CTA -->
     <section class="closing section-padding" id="consulting">
         <div class="container">
-            <div class="closing-grid">
-                <div class="closing-text scroll-animate">
-                    <h2>
-                        EiE 파트너십은<br class="pc-only" />
-                        ‘오픈’보다 ‘지속’을<br class="pc-only" />
+            <div class="closing-content text-center">
+                <div class="closing-text-wrapper">
+                    <h2 class="section-title mb-40">
+                        EiE 파트너십은<br>
+                        ‘확장’보다 ‘지속’을<br>
                         먼저 생각합니다.
                     </h2>
-                    <p>
-                        빠른 확장을 위한 무분별한 가맹은 하지 않습니다.<br />
-                        저희의 교육 철학에 공감하고, 함께 성장할 준비가 된 원장님을 기다립니다.<br />
-                        <br />
-                        지금, 결과로 증명된 시스템과 함께 가장 확실한 영어학원 창업을 준비하세요.
+                    <p class="closing-desc mb-60">
+                        빠른 확장을 위한 무분별한 가맹은 하지 않습니다.<br>
+                        저희의 교육 철학에 공감하고,<br>
+                        함께 성장할 준비가 된 원장님을 기다립니다.<br>
+                        <br>
+                        지금, 결과로 증명된 시스템과 함께<br>
+                        가장 확실한 영어학원 창업을 준비하세요.
                     </p>
                 </div>
-                <div class="consulting-form-wrapper scroll-animate" style="transition-delay: 0.2s">
-                    <h3>가맹 상담 무료 신청</h3>
-                    <form class="consulting-form" onsubmit="event.preventDefault(); alert('상담 신청이 접수되었습니다.');">
-                        <div class="form-group">
-                            <label>이름</label>
-                            <input type="text" placeholder="성함을 입력해주세요" required />
-                        </div>
-                        <div class="form-group">
-                            <label>연락처</label>
-                            <input type="tel" placeholder="010-0000-0000" required />
-                        </div>
-                        <div class="form-group">
-                            <label>창업 희망 지역</label>
-                            <input type="text" placeholder="예: 서울시 성북구" required />
-                        </div>
-                        <div class="form-group">
-                            <label>문의 내용</label>
-                            <textarea rows="4" placeholder="궁금하신 점을 자유롭게 적어주세요"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">상담 신청하기 ></button>
-                    </form>
+                <div class="closing-cta">
+                    <a href="#" class="btn btn-lg btn-primary" onclick="alert('가맹 상담 신청 페이지로 이동합니다.'); return false;">가맹
+                        상담 신청 ></a>
                 </div>
             </div>
         </div>
@@ -474,14 +408,13 @@
 
     <footer class="footer">
         <div class="container text-center">
-            <p>&copy; 2025 EiE 고려대학교 국제어학원. All Rights Reserved.</p>
+            <p>© 2025 EiE 고려대학교 국제어학원. All Rights Reserved.</p>
         </div>
     </footer>
 
     <div id="app"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="./main.js"></script>
-</body>
+    </body>
 
 </html>
